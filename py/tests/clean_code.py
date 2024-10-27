@@ -1,8 +1,7 @@
 import math
 from abc import ABC, abstractmethod
 from typing import Iterable, Union
-from time import perf_counter
-from hwcounter import Timer
+from utils import decorator
 
 
 class ShapeBase(ABC):
@@ -47,6 +46,7 @@ def total_area(shape_count: int, shapes: Iterable):
     
     return accum
 
+@decorator
 def total_area_vtbl4(shape_count: int, shapes: Iterable):
     accum0 = 0.0
     accum1 = 0.0
@@ -70,17 +70,4 @@ def total_area_vtbl4(shape_count: int, shapes: Iterable):
 if __name__ == "__main__":
     shapes = [Square(2), Rectangle(3, 4), Triangle(3, 4), Circle(5)]
     
-    start = perf_counter()
-    result = total_area_vtbl4(1000, shapes)
-    stop = perf_counter()
-    
-    
-    print("Result: ", result)
-    print("Total time: ", stop-start)
-    
-    
-    with Timer() as t:
-        result2 = total_area_vtbl4(1000, shapes)
-    
-    print("Result: ", result)
-    print(f'Elapsed cycles: {t.cycles:,}')
+    _ = total_area_vtbl4(1000, shapes)

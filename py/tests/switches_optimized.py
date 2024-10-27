@@ -1,10 +1,7 @@
 import math
 from typing import Iterable, Union
-from time import perf_counter
-from hwcounter import Timer
 
-
-import math
+from utils import decorator
 
 
 # Define a structure for shape_union
@@ -51,6 +48,7 @@ def total_area(shape_count: int, shapes: Iterable):
     
     return accum
 
+@decorator
 def total_area_vtbl4(shape_count: int, shapes: Iterable):
     accum0 = 0.0
     accum1 = 0.0
@@ -71,6 +69,7 @@ def total_area_vtbl4(shape_count: int, shapes: Iterable):
     result = accum0 + accum1 + accum2 + accum3
     return result
 
+@decorator
 def total_area_vtbl4_match(shape_count: int, shapes: Iterable):
     accum0 = 0.0
     accum1 = 0.0
@@ -98,33 +97,10 @@ if __name__ == "__main__":
         ShapeUnion(2, 3, 4),
         ShapeUnion(3, 5)]
     
-    start = perf_counter()
-    result = total_area_vtbl4(1000, shapes)
-    stop = perf_counter()
-    
     print("____FOR_IF____")
-    print("Result: ", result)
-    print("Total time: ", stop-start)
+    result = total_area_vtbl4(1000, shapes)
     
-    
-    with Timer() as t:
-        result2 = total_area_vtbl4(1000, shapes)
-    
-    print("Result: ", result)
-    print(f'Elapsed cycles: {t.cycles:,}')
-    
+
     print("____FOR_MATCH____")
-    start = perf_counter()
     result = total_area_vtbl4_match(1000, shapes)
-    stop = perf_counter()
-    
-    
-    print("Result: ", result)
-    print("Total time: ", stop-start)
-    
-    
-    with Timer() as t:
-        result2 = total_area_vtbl4(1000, shapes)
-    
-    print("Result: ", result)
-    print(f'Elapsed cycles: {t.cycles:,}')
+

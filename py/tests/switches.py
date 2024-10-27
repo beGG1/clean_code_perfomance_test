@@ -1,8 +1,8 @@
 import math
 from typing import Iterable, Union
-from time import perf_counter
-from hwcounter import Timer
 from enum import Enum
+
+from utils import decorator
 
 
 import math
@@ -44,6 +44,7 @@ def total_area(shape_count: int, shapes: Iterable):
     
     return accum
 
+@decorator
 def total_area_vtbl4(shape_count: int, shapes: Iterable):
     accum0 = 0.0
     accum1 = 0.0
@@ -71,17 +72,4 @@ if __name__ == "__main__":
         ShapeUnion(ShapeType.TRIANGLE, 3, 4),
         ShapeUnion(ShapeType.CIRCLE, 5)]
     
-    start = perf_counter()
     result = total_area_vtbl4(1000, shapes)
-    stop = perf_counter()
-    
-    
-    print("Result: ", result)
-    print("Total time: ", stop-start)
-    
-    
-    with Timer() as t:
-        result2 = total_area_vtbl4(1000, shapes)
-    
-    print("Result: ", result)
-    print(f'Elapsed cycles: {t.cycles:,}')
