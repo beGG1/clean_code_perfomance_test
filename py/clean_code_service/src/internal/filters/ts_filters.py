@@ -55,8 +55,6 @@ class Square(AbstractFilter):
 
     def apply_filter(self, ts: List[Tuple]) -> np.ndarray:
         ts = ts2numpy(ts)
-        print(len(ts2dates(ts)))
-        print(self.sq(ts2vals(ts)))
         return np.vstack([ts2dates(ts), self.sq(ts2vals(ts))]).T
 
 
