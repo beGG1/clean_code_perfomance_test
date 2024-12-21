@@ -36,12 +36,7 @@ class NoFilter(AbstractFilter):
         return ts
 
 
-class Positives(AbstractFilter):
-    """Returns Positive list."""
-
-    def apply_filter(self, ts: List[Tuple]) -> np.ndarray:
-        ts = ts2numpy(ts)
-        return ts[ts2vals(ts) > 0]
++
 
 
 class Square(AbstractFilter):

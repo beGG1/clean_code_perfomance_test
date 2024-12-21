@@ -130,7 +130,7 @@ pub fn test() {
     use SortAlgorithm::*;
 
     // Original data for sorting
-    let data: Vec<i32> = (1..=500).rev().collect();
+    let data: Vec<i32> = (1..=5000).rev().collect();
 
     // Create a vector of enum instances with clones of `data`
     let sorting_jobs = (0..300)

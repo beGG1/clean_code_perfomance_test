@@ -122,7 +122,7 @@ fn quick_sort(array: Vec<i32>) -> Vec<i32> {
 
 pub fn test() {
     // Original data for sorting
-    let data: Vec<i32> = (1..=500).rev().collect();
+    let data: Vec<i32> = (1..=5000).rev().collect();
 
     // Define the sorting jobs as a vector of tuples, each containing a sorting function reference and a copy of the data
     let mut sorting_jobs = vec![];

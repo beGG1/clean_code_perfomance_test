@@ -4,6 +4,7 @@ pub mod switch_sort_without_enums;
 
 use std::time::Instant;
 use sysinfo::{ProcessExt, System, SystemExt};
+use std::{thread, time::Duration};
 
 // Define a struct to hold statistics functions
 struct Stats;
@@ -20,37 +21,45 @@ impl Stats {
         (result, duration)
     }
 
-    fn measure_memory<F, R>(func: F) -> R
-    where
-        F: FnOnce() -> R,
-    {
-        let mut sys = System::new_all();
+    fn measure_memory<F>(func: F) -> f64
+where
+    F: FnOnce(),
+{
+    let process_pid = sysinfo::get_current_pid().unwrap();
 
-        // Refresh system state before accessing process memory
-        sys.refresh_processes();
-        let pid = sysinfo::Pid::from(std::process::id() as usize);
-        let process = sys.process(pid).expect("Process not found");
+    let memory_samples = std::sync::Arc::new(std::sync::Mutex::new(Vec::new()));
+    let sampling = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(true));
 
-        // Record memory before running the function
-        let mem_before = process.memory() as f64 / 1024.0; // in MB
-        
-        // Run the function
-        let result = func();
+    let memory_samples_clone = std::sync::Arc::clone(&memory_samples);
+    let sampling_clone = std::sync::Arc::clone(&sampling);
 
-        // Now that the function has finished, refresh system state again to get updated memory info
-        sys.refresh_processes(); 
-        let process = sys.process(pid).expect("Process not found");
-        
-        // Record memory after
-        let mem_after = process.memory() as f64 / 1024.0; // in MB
+    let sampling_thread = thread::spawn(move || {
+        let mut system = System::new_all();
+        while sampling_clone.load(std::sync::atomic::Ordering::Relaxed) {
+            system.refresh_process(process_pid);
+            if let Some(process) = system.process(process_pid) {
+                let memory = process.memory() as f64 / 1024.0; // Memory in Kb
+                memory_samples_clone.lock().unwrap().push(memory);
+            }
+            thread::sleep(Duration::from_millis(1)); // Adjust sampling interval as needed
+        }
+    });
 
-        // Print memory usage before and after
-        println!("Memory Usage Before: {:.2} MB", mem_before);
-        println!("Memory Usage After: {:.2} MB", mem_after);
-        println!("Memory Used: {:.2} MB", mem_after - mem_before);
+    // Execute the target function
+    func();
 
-        result
-    }
+    // Stop sampling
+    sampling.store(false, std::sync::atomic::Ordering::Relaxed);
+    sampling_thread.join().unwrap();
+
+    // Calculate average and max memory usage
+    let memory_samples = memory_samples.lock().unwrap();
+    let avg_memory = memory_samples.iter().sum::<f64>() / memory_samples.len() as f64;
+
+    println!("Average Memory Usage: {:.2} MB", avg_memory / 1024.0);
+    avg_memory as f64
+}
+    
 
     fn measure_cpu<F, R>(func: F) -> R
     where
@@ -193,7 +202,7 @@ fn main() {
 
     // let (_result, _time) = Stats::measure_time(|| example_function());
 
-    println!("-------------------------------");
+    println!("Clean Code-------------------------------");
 
     let (_result, _time) = Stats::measure_time(|| clean_code::test());
 
@@ -207,7 +216,7 @@ fn main() {
     Stats::measure_memory(|| clean_code::test());
 
     println!("-------------------------------");
-    println!("-------------------------------");
+    println!("Switch Enums-------------------------------");
 
     let (_result, _time) = Stats::measure_time(|| switch_sort_enum::test());
 
@@ -221,7 +230,7 @@ fn main() {
     Stats::measure_memory(|| switch_sort_enum::test());
 
     println!("-------------------------------");
-    println!("-------------------------------");
+    println!("Switch without enums-------------------------------");
 
     let (_result, _time) = Stats::measure_time(|| switch_sort_without_enums::test());
 

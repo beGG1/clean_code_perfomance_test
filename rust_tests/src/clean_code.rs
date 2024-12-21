@@ -140,7 +140,7 @@ impl Sort for QuickSort {
 
 // Test function to run all sorts
 pub fn test() {
-    let data = (1..=500).rev().collect::<Vec<i32>>();
+    let data = (1..=5000).rev().collect::<Vec<i32>>();
     let mut bubble_sorts: Vec<_> = (0..300).map(|_| BubbleSort::new(data.clone())).collect();
     let mut merge_sorts: Vec<_> = (0..300).map(|_| MergeSort::new(data.clone())).collect();
     let mut quick_sorts: Vec<_> = (0..300).map(|_| QuickSort::new(data.clone())).collect();
