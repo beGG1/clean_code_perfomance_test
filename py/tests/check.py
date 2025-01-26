@@ -1,5 +1,6 @@
 import math
 import time
+from ABC import ABC, abstractmehod
 
 def calculate_area_match(shape):
     match shape[0]:
@@ -25,7 +26,8 @@ def test_match():
             total_area += calculate_area_match(shape)
     print("Total Area (Match-Case):", total_area)
 
-class Shape:
+class Shape(ABC):
+    @abstractmethod
     def calculate_area(self):
         raise NotImplementedError
 
